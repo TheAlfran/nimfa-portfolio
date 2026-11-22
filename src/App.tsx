@@ -331,14 +331,16 @@ export default function App() {
 
                       <div className="p-6 md:p-8 flex flex-col justify-between flex-1 space-y-5 bg-white">
                         <div className="space-y-3">
-                          <div className="flex items-center gap-2 text-xs text-[#64748B]">
-                            <span className="font-medium text-[#334155]">
-                              {project.categoryLabel}
-                            </span>
-                            <span aria-hidden="true">·</span>
-                            <span className="tabular-nums">{project.year}</span>
-                            <span aria-hidden="true">·</span>
-                            <span>{project.organization}</span>
+                          {/* Category · year on one line, organization below (long names wrap cleanly) */}
+                          <div className="space-y-0.5 text-xs text-[#64748B]">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-[#334155]">
+                                {project.categoryLabel}
+                              </span>
+                              <span aria-hidden="true">·</span>
+                              <span className="tabular-nums">{project.year}</span>
+                            </div>
+                            <div className="leading-snug">{project.organization}</div>
                           </div>
 
                           <h3 className="font-editorial text-xl md:text-2xl font-semibold tracking-tight text-[#0F172A] group-hover:text-[#1D4ED8] transition-colors duration-150">

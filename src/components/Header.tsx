@@ -64,7 +64,7 @@ export function Header({ onContactClick }: HeaderProps) {
             aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((prev) => !prev)}
-            className="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-lg border border-[#E2E8F0] bg-white text-[#0F172A] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+            className="md:hidden -mr-2.5 inline-flex items-center justify-center w-11 h-11 rounded-lg text-[#0F172A] active:bg-[#F1F5F9] transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-[#1D4ED8]"
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
