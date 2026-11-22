@@ -68,6 +68,13 @@ export const PROFILE = {
 
 export const HERO_IMAGE = '/images/profile.jpg';
 
+// Your resume PDF (in public/). Replace the file to update it; keep the same name or change it here.
+export const RESUME_PDF = {
+  url: '/Nimfa-Mae-Sumalinog-Resume.pdf',
+  downloadName: 'Nimfa-Mae-Sumalinog-Resume.pdf',
+  details: 'PDF · 1 page',
+};
+
 export const IMPACT_METRICS = [
   {
     value: '2019',

@@ -17,6 +17,20 @@ bun run lint     # lint with oxlint
 
 All text, projects, experience, and links live in `src/data/portfolioData.ts`.
 
+## Updating the resume
+
+The resume popup shows an image of the PDF (sharp, no browser PDF toolbar, works on phones);
+the Open and Download buttons give visitors the real PDF.
+
+1. Replace `public/Nimfa-Mae-Sumalinog-Resume.pdf` with the new PDF (same file name).
+2. Regenerate the images:
+   ```bash
+   bun run resume:images
+   ```
+   This updates `public/resume/` and `src/data/resumePages.ts` (multi-page PDFs work too).
+
+To use a different file name, change `RESUME_PDF` in `src/data/portfolioData.ts`.
+
 ## Contact form (EmailJS)
 
 The contact form emails messages to you through [EmailJS](https://www.emailjs.com) — no backend

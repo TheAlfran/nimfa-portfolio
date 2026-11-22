@@ -1,168 +1,90 @@
-import { useEffect } from 'react';
-import { Printer, X } from 'lucide-react';
-import { CAREER_TIMELINE, CORE_COMPETENCIES, RESUME_PROFILE } from '@/data/portfolioData';
+import { useState } from 'react';
+import { Download } from 'lucide-react';
+import { RESUME_PDF, RESUME_PROFILE } from '@/data/portfolioData';
+import { RESUME_PAGES } from '@/data/resumePages';
+import { ImageViewer } from './ImageViewer';
+import { Modal } from './Modal';
 
 interface ResumeModalProps {
   open: boolean;
   onClose: () => void;
 }
 
+// The resume is shown as images of the PDF pages (made by `bun run resume:images`), so it looks
+// the same everywhere — no browser PDF viewer, toolbar, or frame — and works on phones too.
+// Clicking the resume opens a full-screen, zoomable view of the image; Download gives the real PDF.
+
+const downloadButton =
+  'inline-flex shrink-0 items-center justify-center gap-2 h-11 px-5 text-sm font-medium text-white bg-[#1D4ED8] hover:bg-[#1E40AF] rounded-lg transition-colors whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D4ED8] max-sm:w-full max-sm:h-12 max-sm:text-base';
+
 export function ResumeModal({ open, onClose }: ResumeModalProps) {
-  useEffect(() => {
-    if (!open) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [open, onClose]);
-
-  if (!open) return null;
+  const total = RESUME_PAGES.length;
+  const [viewing, setViewing] = useState<number | null>(null);
+  const pageAlt = (i: number) =>
+    `Resume of ${RESUME_PROFILE.name}${total > 1 ? `, page ${i + 1} of ${total}` : ''}`;
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="resume-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/75 backdrop-blur-xs p-4 md:p-8"
-      onClick={onClose}
+    <Modal
+      open={open}
+      onClose={onClose}
+      titleId="resume-modal-title"
+      closeLabel="Close resume"
+      label="Resume"
     >
-      <div
-        className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-[#E2E8F0] shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Action Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between px-6 md:px-8 py-4 bg-white/95 backdrop-blur-xs border-b border-[#E2E8F0] no-print">
-          <span className="text-xs font-medium text-[#64748B]">
-            Resume
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => window.print()}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-[#1D4ED8] hover:bg-[#1E40AF] rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              Print / Save PDF
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close resume view"
-              className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-[#E2E8F0] text-[#0F172A] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Printable Document Surface */}
-        <div className="p-6 md:p-10 space-y-8">
-          <div className="border-b border-[#E2E8F0] pb-6 space-y-2">
+      <div className="px-5 md:px-7 pt-1 pb-6">
+        {/* Name + Download: side by side on larger screens, stacked on phones */}
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="min-w-0">
             <h2
               id="resume-modal-title"
-              className="font-editorial text-3xl font-semibold tracking-tight text-[#0F172A]"
+              className="font-editorial text-[1.5rem] md:text-[1.75rem] font-semibold tracking-tight leading-[1.2] text-[#0F172A]"
             >
               {RESUME_PROFILE.name}
             </h2>
-            <p className="text-base font-medium text-[#1D4ED8]">
-              {RESUME_PROFILE.title}
-            </p>
-            <p className="text-xs text-[#64748B]">
-              {RESUME_PROFILE.location} <span aria-hidden="true">·</span> {RESUME_PROFILE.email}
-              {RESUME_PROFILE.linkedin && (
-                <>
-                  {' '}<span aria-hidden="true">·</span> {RESUME_PROFILE.linkedin}
-                </>
-              )}
-            </p>
+            <p className="mt-1 text-base text-[#475569]">{RESUME_PROFILE.title}</p>
           </div>
-
-          <section className="space-y-4">
-            <h3 className="text-xs font-semibold tracking-wide text-[#64748B]">
-              Core Strengths
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {CORE_COMPETENCIES.map((item) => (
-                <div key={item.number} className="space-y-1.5">
-                  <div className="text-sm font-semibold text-[#0F172A]">
-                    {item.title}
-                  </div>
-                  <p className="text-xs text-[#475569] leading-relaxed">
-                    {item.deliverables}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="space-y-5 pt-4 border-t border-[#E2E8F0]">
-            <h3 className="text-xs font-semibold tracking-wide text-[#64748B]">
-              Professional Experience
-            </h3>
-            <div className="space-y-6">
-              {CAREER_TIMELINE.map((role) => (
-                <div key={role.period} className="space-y-2">
-                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
-                    <div className="text-sm font-semibold text-[#0F172A]">
-                      {role.role} <span className="font-normal text-[#64748B]">— {role.company}</span>
-                    </div>
-                    <div className="font-mono text-xs text-[#64748B] tabular-nums shrink-0">
-                      {role.period}
-                    </div>
-                  </div>
-                  <p className="text-xs text-[#475569] leading-relaxed">
-                    {role.summary}
-                  </p>
-                  <ul className="space-y-1.5 pl-4 list-disc text-xs text-[#334155]">
-                    {role.highlights.map((hl, idx) => (
-                      <li key={idx} className="leading-relaxed">
-                        {hl}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-[#E2E8F0]">
-            <section className="space-y-3">
-              <h3 className="text-xs font-semibold tracking-wide text-[#64748B]">
-                Education &amp; Credentials
-              </h3>
-              <div className="space-y-3">
-                {RESUME_PROFILE.education.map((edu) => (
-                  <div key={edu.degree} className="space-y-0.5">
-                    <div className="text-sm font-medium text-[#0F172A]">
-                      {edu.degree}
-                    </div>
-                    <div className="text-xs text-[#64748B]">
-                      {edu.institution} <span aria-hidden="true">·</span>{' '}
-                      <span className="tabular-nums">{edu.year}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <section className="space-y-3">
-              <h3 className="text-xs font-semibold tracking-wide text-[#64748B]">
-                Skills
-              </h3>
-              <p className="text-xs text-[#334155] leading-relaxed">
-                {RESUME_PROFILE.coreTools.join(' · ')}
-              </p>
-            </section>
-          </div>
+          <a href={RESUME_PDF.url} download={RESUME_PDF.downloadName} className={downloadButton}>
+            <Download className="w-4 h-4" />
+            Download PDF
+          </a>
         </div>
+
+        <div className="mt-4 space-y-4">
+          {RESUME_PAGES.map((page, i) => (
+            <button
+              key={page.src}
+              type="button"
+              onClick={() => setViewing(i)}
+              className="block w-full overflow-hidden rounded-md border border-[#E2E8F0] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.08)] cursor-zoom-in focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D4ED8]"
+              aria-label={`View the resume full screen${total > 1 ? ` (page ${i + 1} of ${total})` : ''}`}
+            >
+              <img
+                src={page.src}
+                width={page.width}
+                height={page.height}
+                alt={pageAlt(i)}
+                loading={i === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+                className="block w-full h-auto"
+              />
+            </button>
+          ))}
+        </div>
+
+        <p className="mt-3 text-sm text-[#475569]">
+          <span className="sm:hidden">Tap</span>
+          <span className="max-sm:hidden">Click</span> the resume to view it full screen and zoom in.
+        </p>
       </div>
-    </div>
+
+      <ImageViewer
+        image={
+          viewing !== null && RESUME_PAGES[viewing]
+            ? { ...RESUME_PAGES[viewing], alt: pageAlt(viewing) }
+            : null
+        }
+        onClose={() => setViewing(null)}
+      />
+    </Modal>
   );
 }

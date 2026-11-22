@@ -385,7 +385,7 @@ export default function App() {
                 className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-[#0F172A] bg-white hover:bg-[#F1F5F9] border border-[#E2E8F0] rounded-lg transition-colors whitespace-nowrap shrink-0 self-start sm:self-auto cursor-pointer"
               >
                 <FileText className="w-3.5 h-3.5 text-[#475569]" />
-                Open Printable Resume
+                View Resume (PDF)
               </button>
             </div>
 
