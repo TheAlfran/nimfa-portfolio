@@ -23,6 +23,8 @@ import {
   PROFILE,
   type ProjectCategory,
   RESUME_PROFILE,
+  SECTIONS,
+  FILTER_OPTIONS,
   TESTIMONIALS,
 } from '@/data/portfolioData';
 import { Header } from '@/components/Header';
@@ -31,12 +33,6 @@ import { CaseStudyModal } from '@/components/CaseStudyModal';
 import { ResumeModal } from '@/components/ResumeModal';
 import { sendContactMessage } from '@/lib/contact';
 
-const FILTER_OPTIONS: { id: ProjectCategory; label: string }[] = [
-  { id: 'all', label: 'All Work' },
-  { id: 'administration', label: 'Administration' },
-  { id: 'finance', label: 'Finance & Compliance' },
-  { id: 'technology', label: 'Technology' },
-];
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -50,7 +46,7 @@ export default function App() {
     name: '',
     email: '',
     company: '',
-    topic: 'Job Opportunity',
+    topic: PROFILE.contactTopics[0],
     message: '',
   });
   const [formError, setFormError] = useState<string | null>(null);
@@ -154,7 +150,7 @@ export default function App() {
       name: '',
       email: '',
       company: '',
-      topic: 'Job Opportunity',
+      topic: PROFILE.contactTopics[0],
       message: '',
     });
     setFormError(null);
@@ -248,15 +244,14 @@ export default function App() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
               <div className="space-y-3 max-w-2xl">
                 <p className="text-xs font-medium text-[#1D4ED8]">
-                  What I Do
+                  {SECTIONS.whatIDo.eyebrow}
                 </p>
                 <h2 className="font-editorial text-3xl md:text-4xl font-semibold tracking-tight text-[#0F172A] text-balance">
-                  Organized, reliable support for busy offices and teams.
+                  {SECTIONS.whatIDo.title}
                 </h2>
               </div>
               <p className="text-sm text-[#475569] max-w-[42ch] leading-relaxed">
-                From day-to-day coordination to financial documents and compliance, I keep the details
-                accurate and on schedule.
+                {SECTIONS.whatIDo.intro}
               </p>
             </div>
 
@@ -279,7 +274,7 @@ export default function App() {
                   </div>
 
                   <p className="text-xs font-medium text-[#64748B] pt-2">
-                    {item.deliverables}
+                    {item.deliverables.join(' · ')}
                   </p>
                 </article>
               ))}
@@ -295,10 +290,10 @@ export default function App() {
               <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-6 sm:mb-12">
                 <div className="space-y-3 max-w-2xl">
                   <p className="text-xs font-medium text-[#1D4ED8]">
-                    Selected Work
+                    {SECTIONS.work.eyebrow}
                   </p>
                   <h2 className="font-editorial text-3xl md:text-4xl font-semibold tracking-tight text-[#0F172A] text-balance">
-                    Highlights from my recent roles.
+                    {SECTIONS.work.title}
                   </h2>
                 </div>
 
@@ -422,10 +417,10 @@ export default function App() {
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
               <div className="space-y-3">
                 <p className="text-xs font-medium text-[#1D4ED8]">
-                  Career History
+                  {SECTIONS.experience.eyebrow}
                 </p>
                 <h2 className="font-editorial text-3xl md:text-4xl font-semibold tracking-tight text-[#0F172A] text-balance">
-                  Experience across private, academic, and government offices.
+                  {SECTIONS.experience.title}
                 </h2>
               </div>
 
@@ -490,10 +485,10 @@ export default function App() {
             <div className="max-w-300 mx-auto px-6 md:px-10">
               <div className="space-y-3 mb-12 max-w-2xl">
                 <p className="text-xs font-medium text-[#1D4ED8]">
-                  Endorsements
+                  {SECTIONS.testimonials.eyebrow}
                 </p>
                 <h2 className="font-editorial text-3xl md:text-4xl font-semibold tracking-tight text-[#0F172A] text-balance">
-                  What colleagues say about working with me.
+                  {SECTIONS.testimonials.title}
                 </h2>
               </div>
 
@@ -538,7 +533,7 @@ export default function App() {
               <div className="lg:col-span-5 space-y-6">
                 <div className="space-y-3">
                   <p className="text-xs font-medium text-[#1D4ED8]">
-                    Contact &amp; Inquiries
+                    {SECTIONS.contact.eyebrow}
                   </p>
                   <h2 className="font-editorial text-3xl md:text-4xl font-semibold tracking-tight text-[#0F172A] text-balance">
                     {PROFILE.contactHeadline}
@@ -699,9 +694,11 @@ export default function App() {
                               }
                               className="w-full appearance-none pl-3.5 pr-10 py-2.5 text-sm text-[#0F172A] bg-[#F8FAFC] border border-[#CBD5E1] rounded-lg cursor-pointer focus:outline-none focus:border-[#1D4ED8] focus:ring-2 focus:ring-[#1D4ED8]/15"
                             >
-                              <option value="Job Opportunity">Job Opportunity</option>
-                              <option value="Freelance / Part-Time Work">Freelance / Part-Time Work</option>
-                              <option value="General Inquiry">General Inquiry</option>
+                              {PROFILE.contactTopics.map((topic) => (
+                                <option key={topic} value={topic}>
+                                  {topic}
+                                </option>
+                              ))}
                             </select>
                             <ChevronDown
                               aria-hidden="true"
@@ -742,7 +739,7 @@ export default function App() {
 
                       <div className="flex flex-col-reverse gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                         <span className="text-xs text-[#64748B] text-center sm:text-left">
-                          I usually reply within a few days
+                          {PROFILE.replyTime}
                         </span>
                         <button
                           type="submit"
