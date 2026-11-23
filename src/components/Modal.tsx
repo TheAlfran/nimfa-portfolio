@@ -28,6 +28,10 @@ interface ModalProps {
   onKeyDown?: (e: KeyboardEvent) => void;
   /** Gives the parent access to the scrolling area (e.g. to scroll back to top) */
   bodyRef?: RefObject<HTMLDivElement | null>;
+  /** Keep the card the same height on larger screens (content scrolls) so it never resizes */
+  fixedHeight?: boolean;
+  /** Narrower card on larger screens (for portrait content like the resume) */
+  narrow?: boolean;
   children: ReactNode;
 }
 
@@ -46,6 +50,8 @@ function ModalFrame({
   closeLabel = 'Close',
   onKeyDown,
   bodyRef,
+  fixedHeight,
+  narrow,
   children,
 }: ModalProps) {
   // While the closing animation plays, stop the invisible layer from blocking taps/clicks.
@@ -97,7 +103,7 @@ function ModalFrame({
     >
       <motion.div
         data-modal-panel=""
-        className="relative w-full h-[100dvh] sm:h-auto sm:max-w-3xl sm:max-h-[94svh] flex flex-col bg-white sm:rounded-xl sm:shadow-[0_24px_64px_-16px_rgba(15,23,42,0.35)] overflow-hidden"
+        className={`relative w-full h-dvh ${fixedHeight ? 'sm:h-[88svh]' : 'sm:h-auto'} ${narrow ? 'sm:max-w-xl' : 'sm:max-w-3xl'} sm:max-h-[94svh] flex flex-col bg-white sm:rounded-xl sm:shadow-[0_24px_64px_-16px_rgba(15,23,42,0.35)] overflow-hidden`}
         onClick={(e) => e.stopPropagation()}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -125,7 +131,7 @@ function ModalFrame({
         <div
           ref={bodyRef}
           data-modal-body=""
-          className="min-h-0 flex-1 sm:flex-initial overflow-y-auto overflow-x-hidden overscroll-contain"
+          className={`min-h-0 flex-1 ${fixedHeight ? 'scrollbar-gutter-stable' : 'sm:flex-initial'} overflow-y-auto overflow-x-hidden overscroll-contain`}
         >
           {children}
         </div>

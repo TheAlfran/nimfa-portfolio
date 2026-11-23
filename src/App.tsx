@@ -1,8 +1,10 @@
-import { type FormEvent, useMemo, useRef, useState } from 'react';
+import { type FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowUpRight,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Copy,
   FileText,
   Loader2,
@@ -56,6 +58,26 @@ export default function App() {
   const [formSending, setFormSending] = useState(false);
 
   const contactRef = useRef<HTMLElement | null>(null);
+
+  // On phones the filter row scrolls sideways: show an arrow on each side while more tabs are hidden there
+  const filterRef = useRef<HTMLDivElement | null>(null);
+  const [filterHasMore, setFilterHasMore] = useState(false);
+  const [filterHasPrev, setFilterHasPrev] = useState(false);
+  useEffect(() => {
+    const el = filterRef.current;
+    if (!el) return;
+    const update = () => {
+      setFilterHasMore(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+      setFilterHasPrev(el.scrollLeft > 4);
+    };
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      el.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, []);
 
   const filteredProjects = useMemo(() => {
     if (activeCategory === 'all') return CASE_STUDIES;
@@ -146,7 +168,7 @@ export default function App() {
 
         <main className="no-print">
           {/* Hero Split Section */}
-          <section className="max-w-[1200px] mx-auto px-6 md:px-10 pt-10 md:pt-16 pb-12 lg:py-8 lg:min-h-[calc(100svh-4rem)] lg:flex lg:flex-col">
+          <section className="max-w-300 mx-auto px-6 md:px-10 pt-10 md:pt-16 pb-12 lg:py-8 lg:min-h-[calc(100svh-4rem)] lg:flex lg:flex-col">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch lg:items-center lg:flex-1">
               {/* Left Column: Typographic Hierarchy */}
               <motion.div
@@ -167,10 +189,10 @@ export default function App() {
                   {PROFILE.heroIntro}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-4 pt-2">
+                <div className="grid grid-cols-2 gap-3 pt-2 sm:flex sm:flex-wrap sm:items-center sm:gap-4">
                   <a
                     href="#work"
-                    className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-white bg-[#1D4ED8] hover:bg-[#1E40AF] rounded-lg transition-colors duration-150 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D4ED8]"
+                    className="inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-3 text-sm font-medium text-white bg-[#1D4ED8] hover:bg-[#1E40AF] rounded-lg transition-colors duration-150 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D4ED8]"
                   >
                     See My Work
                     <ArrowUpRight className="w-4 h-4" />
@@ -179,7 +201,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => setResumeOpen(true)}
-                    className="inline-flex items-center gap-2 px-5 py-3 text-sm font-medium text-[#0F172A] bg-white hover:bg-[#F1F5F9] border border-[#E2E8F0] rounded-lg transition-colors duration-150 whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D4ED8]"
+                    className="inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-3 text-sm font-medium text-[#0F172A] bg-white hover:bg-[#F1F5F9] border border-[#E2E8F0] rounded-lg transition-colors duration-150 whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D4ED8]"
                   >
                     <FileText className="w-4 h-4 text-[#475569]" />
                     View Resume
@@ -194,7 +216,7 @@ export default function App() {
                 transition={{ duration: 0.4, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
                 className="lg:col-span-5"
               >
-                <div className="h-full min-h-[340px] lg:min-h-0 lg:h-[clamp(300px,calc(100svh-22rem),540px)] rounded-2xl overflow-hidden border border-[#E2E8F0] bg-white">
+                <div className="h-full min-h-85 lg:min-h-0 lg:h-[clamp(300px,calc(100svh-22rem),540px)] rounded-2xl max-sm:-mx-6 max-sm:rounded-none max-sm:border-x-0 overflow-hidden border border-[#E2E8F0] bg-white">
                   <ResilientImage
                     src={HERO_IMAGE}
                     alt={`Portrait of ${PROFILE.name}`}
@@ -222,7 +244,7 @@ export default function App() {
           </section>
 
           {/* Section 1: What I Do */}
-          <section id="what-i-do" className="max-w-[1200px] mx-auto px-6 md:px-10 py-16 md:py-20 scroll-mt-16">
+          <section id="what-i-do" className="max-w-300 mx-auto px-6 md:px-10 py-16 md:py-20 scroll-mt-16">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
               <div className="space-y-3 max-w-2xl">
                 <p className="text-xs font-medium text-[#1D4ED8]">
@@ -269,8 +291,8 @@ export default function App() {
             id="work"
             className="bg-white border-y border-[#E2E8F0] py-16 md:py-20 scroll-mt-16"
           >
-            <div className="max-w-[1200px] mx-auto px-6 md:px-10">
-              <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
+            <div className="max-w-300 mx-auto px-6 md:px-10">
+              <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-6 sm:mb-12">
                 <div className="space-y-3 max-w-2xl">
                   <p className="text-xs font-medium text-[#1D4ED8]">
                     Selected Work
@@ -281,10 +303,12 @@ export default function App() {
                 </div>
 
                 {/* Interactive Segmented Filter Control */}
+                <div className="relative self-start lg:self-auto lg:shrink-0 max-sm:-mx-6 max-sm:self-stretch">
                 <div
+                  ref={filterRef}
                   role="tablist"
                   aria-label="Filter case studies by discipline"
-                  className="inline-flex flex-wrap items-center gap-1 p-1 bg-[#F1F5F9] rounded-lg border border-[#E2E8F0] self-start lg:self-auto"
+                  className="inline-flex flex-wrap items-center gap-1 p-1 bg-[#F1F5F9] rounded-lg border border-[#E2E8F0] max-sm:flex max-sm:flex-nowrap max-sm:overflow-x-auto max-sm:rounded-none max-sm:border-x-0 max-sm:px-6 max-sm:py-1.5 max-sm:scrollbar-none max-sm:[&::-webkit-scrollbar]:hidden"
                 >
                   {FILTER_OPTIONS.map((option) => {
                     const isActive = activeCategory === option.id;
@@ -306,26 +330,50 @@ export default function App() {
                     );
                   })}
                 </div>
+                {/* Phones: fade + arrows while more filters are hidden to the left / right */}
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  aria-label="Show previous filters"
+                  onClick={() => filterRef.current?.scrollBy({ left: -160, behavior: 'smooth' })}
+                  className={`sm:hidden absolute inset-y-px left-0 flex w-14 items-center justify-start pl-3 bg-linear-to-r from-[#F1F5F9] from-55% to-transparent text-[#475569] transition-opacity duration-150 ${
+                    filterHasPrev ? 'opacity-100' : 'pointer-events-none opacity-0'
+                  }`}
+                >
+                  <ChevronLeft className="w-4 h-4" strokeWidth={2} />
+                </button>
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  aria-label="Show more filters"
+                  onClick={() => filterRef.current?.scrollBy({ left: 160, behavior: 'smooth' })}
+                  className={`sm:hidden absolute inset-y-px right-0 flex w-14 items-center justify-end pr-3 bg-linear-to-l from-[#F1F5F9] from-55% to-transparent text-[#475569] transition-opacity duration-150 ${
+                    filterHasMore ? 'opacity-100' : 'pointer-events-none opacity-0'
+                  }`}
+                >
+                  <ChevronRight className="w-4 h-4" strokeWidth={2} />
+                </button>
+                </div>
               </div>
 
               {/* Bento-Balanced 2-Column Case Study Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-4 lg:gap-8">
                 {filteredProjects.map((project) => (
                   <article
                     key={project.id}
-                    className="group rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] overflow-hidden flex flex-col transition-colors duration-150 hover:border-[#CBD5E1]"
+                    className="group rounded-lg max-sm:-mx-6 max-sm:rounded-none max-sm:border-x-0 border border-[#E2E8F0] bg-[#F8FAFC] overflow-hidden flex flex-col transition-colors duration-150 hover:border-[#CBD5E1]"
                   >
                     <button
                       type="button"
                       onClick={() => setSelectedCaseStudy(project)}
                       className="text-left flex flex-col h-full cursor-pointer focus-visible:outline-2 focus-visible:outline-[#1D4ED8]"
                     >
-                      <div className="aspect-[4/3] w-full overflow-hidden bg-[#E2E8F0]">
+                      <div className="aspect-4/3 w-full overflow-hidden bg-[#E2E8F0]">
                         <ResilientImage
                           src={project.image}
                           alt={project.imageAlt}
                           fallbackLabel={project.title}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-102"
                         />
                       </div>
 
@@ -352,7 +400,7 @@ export default function App() {
                           </p>
                         </div>
 
-                        <div className="pt-4 border-t border-[#E2E8F0] flex items-center justify-between gap-4">
+                        <div className="pt-4 border-t border-[#E2E8F0] flex items-start justify-between gap-4">
                           <span className="text-xs font-semibold text-[#0F172A]">
                             {project.impactHeadline}
                           </span>
@@ -370,7 +418,7 @@ export default function App() {
           </section>
 
           {/* Section 3: Career Progression */}
-          <section id="experience" className="max-w-[1200px] mx-auto px-6 md:px-10 py-16 md:py-20 scroll-mt-16">
+          <section id="experience" className="max-w-300 mx-auto px-6 md:px-10 py-16 md:py-20 scroll-mt-16">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
               <div className="space-y-3">
                 <p className="text-xs font-medium text-[#1D4ED8]">
@@ -439,7 +487,7 @@ export default function App() {
             id="endorsements"
             className="bg-white border-y border-[#E2E8F0] py-16 md:py-20 scroll-mt-16"
           >
-            <div className="max-w-[1200px] mx-auto px-6 md:px-10">
+            <div className="max-w-300 mx-auto px-6 md:px-10">
               <div className="space-y-3 mb-12 max-w-2xl">
                 <p className="text-xs font-medium text-[#1D4ED8]">
                   Endorsements
@@ -453,7 +501,7 @@ export default function App() {
                 {TESTIMONIALS.map((item) => (
                   <figure
                     key={item.author}
-                    className="p-8 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] flex flex-col justify-between space-y-6"
+                    className="p-8 rounded-2xl max-sm:-mx-6 max-sm:rounded-none max-sm:border-x-0 border border-[#E2E8F0] bg-[#F8FAFC] flex flex-col justify-between space-y-6"
                   >
                     <div className="space-y-4">
                       <div className="text-xs font-medium text-[#64748B]">
@@ -483,7 +531,7 @@ export default function App() {
           <section
             ref={contactRef}
             id="contact"
-            className="max-w-[1200px] mx-auto px-6 md:px-10 py-16 md:py-24 scroll-mt-16"
+            className="max-w-300 mx-auto px-6 md:px-10 py-16 md:py-24 scroll-mt-16"
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
               {/* Left Column: Direct Details */}
@@ -537,7 +585,7 @@ export default function App() {
 
               {/* Right Column: Validated Inquiry Form */}
               <div className="lg:col-span-7">
-                <div className="p-6 md:p-8 rounded-2xl border border-[#E2E8F0] bg-white">
+                <div className="p-6 md:p-8 rounded-2xl max-sm:-mx-6 max-sm:rounded-none max-sm:border-x-0 border border-[#E2E8F0] bg-white">
                   {formSubmitted ? (
                     <div className="py-8 space-y-4">
                       <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-[#DCFCE7] text-[#15803D]">
@@ -692,15 +740,15 @@ export default function App() {
                         </p>
                       )}
 
-                      <div className="flex items-center justify-between gap-4 pt-1">
-                        <span className="text-xs text-[#64748B]">
+                      <div className="flex flex-col-reverse gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                        <span className="text-xs text-[#64748B] text-center sm:text-left">
                           I usually reply within a few days
                         </span>
                         <button
                           type="submit"
                           disabled={formSending}
                           aria-busy={formSending}
-                          className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-[#1D4ED8] hover:bg-[#1E40AF] rounded-lg transition-colors duration-150 whitespace-nowrap shrink-0 cursor-pointer disabled:cursor-wait disabled:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D4ED8]"
+                          className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 sm:py-2.5 text-sm font-medium text-white bg-[#1D4ED8] hover:bg-[#1E40AF] rounded-lg transition-colors duration-150 whitespace-nowrap shrink-0 cursor-pointer disabled:cursor-wait disabled:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D4ED8]"
                         >
                           {formSending ? (
                             <>
@@ -725,12 +773,12 @@ export default function App() {
 
         {/* Quiet Editorial Footer */}
         <footer className="border-t border-[#E2E8F0] bg-white py-8 no-print">
-          <div className="max-w-[1200px] mx-auto px-6 md:px-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-[#64748B]">
+          <div className="max-w-300 mx-auto px-6 md:px-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-[#64748B]">
             <div>
               &copy; {CURRENT_YEAR} {RESUME_PROFILE.name} <span aria-hidden="true">·</span>{' '}
               {PROFILE.shortTitle}
             </div>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-6 max-sm:w-full max-sm:justify-between">
               <a href="#what-i-do" className="hover:text-[#0F172A] transition-colors whitespace-nowrap">
                 What I Do
               </a>

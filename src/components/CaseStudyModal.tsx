@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import type { CaseStudy } from '@/data/portfolioData';
 import { MODAL_EASE } from '@/lib/motion';
-import { useIsMobile } from '@/lib/useIsMobile';
 import { Modal, ModalLabel } from './Modal';
 
 interface CaseStudyModalProps {
@@ -31,7 +30,7 @@ function CoverImage({ src, alt }: { src: string; alt: string }) {
   const [failed, setFailed] = useState(false);
   if (!src || failed) return null;
   return (
-    <div className="mb-5 aspect-[21/9] w-full overflow-hidden rounded-lg bg-[#F1F5F9]">
+    <div className="mb-5 aspect-21/9 w-full overflow-hidden rounded-lg bg-[#F1F5F9]">
       <img
         src={src}
         alt={alt}
@@ -45,9 +44,7 @@ function CoverImage({ src, alt }: { src: string; alt: string }) {
 
 export function CaseStudyModal({ caseStudy, items, onClose, onNavigate }: CaseStudyModalProps) {
   const bodyRef = useRef<HTMLDivElement | null>(null);
-  const contentRef = useRef<HTMLDivElement | null>(null);
   const isOpen = caseStudy !== null;
-  const isMobile = useIsMobile();
 
   // Remember the last shown case study so the popup still has content while it fades out
   const [lastShown, setLastShown] = useState<CaseStudy | null>(caseStudy);
@@ -56,8 +53,6 @@ export function CaseStudyModal({ caseStudy, items, onClose, onNavigate }: CaseSt
 
   // Which way the content slides: 1 = next, -1 = previous
   const [direction, setDirection] = useState(1);
-  // Height of the current case study, so the popup grows/shrinks smoothly instead of snapping
-  const [contentHeight, setContentHeight] = useState<number | 'auto'>('auto');
 
   const go = useCallback(
     (dir: 'prev' | 'next') => {
@@ -66,17 +61,6 @@ export function CaseStudyModal({ caseStudy, items, onClose, onNavigate }: CaseSt
     },
     [onNavigate],
   );
-
-  useEffect(() => {
-    const el = contentRef.current;
-    if (!isOpen || !el) return;
-    const observer = new ResizeObserver(() => setContentHeight(el.offsetHeight));
-    observer.observe(el);
-    return () => {
-      observer.disconnect();
-      setContentHeight('auto');
-    };
-  }, [isOpen]);
 
   const index = shown ? items.findIndex((item) => item.id === shown.id) : -1;
   const total = items.length;
@@ -89,6 +73,7 @@ export function CaseStudyModal({ caseStudy, items, onClose, onNavigate }: CaseSt
       titleId="case-study-modal-title"
       closeLabel="Close case study"
       bodyRef={bodyRef}
+      fixedHeight
       onKeyDown={(e) => {
         if (e.key === 'ArrowLeft') go('prev');
         if (e.key === 'ArrowRight') go('next');
@@ -133,15 +118,7 @@ export function CaseStudyModal({ caseStudy, items, onClose, onNavigate }: CaseSt
         )
       }
     >
-      {/* Animated height (larger screens) so the popup resizes smoothly between case studies */}
-      <motion.div
-        className="overflow-hidden"
-        initial={false}
-        animate={{ height: isMobile ? 'auto' : contentHeight }}
-        transition={{ duration: 0.32, ease: MODAL_EASE }}
-      >
-        <div ref={contentRef}>
-          <AnimatePresence
+      <AnimatePresence
             mode="wait"
             initial={false}
             custom={direction}
@@ -224,8 +201,6 @@ export function CaseStudyModal({ caseStudy, items, onClose, onNavigate }: CaseSt
               </motion.article>
             )}
           </AnimatePresence>
-        </div>
-      </motion.div>
     </Modal>
   );
 }

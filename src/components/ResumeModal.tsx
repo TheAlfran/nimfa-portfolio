@@ -15,7 +15,7 @@ interface ResumeModalProps {
 // Clicking the resume opens a full-screen, zoomable view of the image; Download gives the real PDF.
 
 const downloadButton =
-  'inline-flex shrink-0 items-center justify-center gap-2 h-11 px-5 text-sm font-medium text-white bg-[#1D4ED8] hover:bg-[#1E40AF] rounded-lg transition-colors whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D4ED8] max-sm:w-full max-sm:h-12 max-sm:text-base';
+  'inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-3.5 text-[13px] font-medium text-white bg-[#1D4ED8] hover:bg-[#1E40AF] rounded-lg transition-colors whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D4ED8] max-sm:w-full max-sm:h-11 max-sm:text-sm';
 
 export function ResumeModal({ open, onClose }: ResumeModalProps) {
   const total = RESUME_PAGES.length;
@@ -30,21 +30,22 @@ export function ResumeModal({ open, onClose }: ResumeModalProps) {
       titleId="resume-modal-title"
       closeLabel="Close resume"
       label="Resume"
+      narrow
     >
-      <div className="px-5 md:px-7 pt-1 pb-6">
+      <div className="px-5 md:px-7 pt-1 pb-6 max-sm:min-h-full max-sm:flex max-sm:flex-col max-sm:justify-center">
         {/* Name + Download: side by side on larger screens, stacked on phones */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="min-w-0">
             <h2
               id="resume-modal-title"
-              className="font-editorial text-[1.5rem] md:text-[1.75rem] font-semibold tracking-tight leading-[1.2] text-[#0F172A]"
+              className="font-editorial text-[1.25rem] md:text-[1.375rem] font-semibold tracking-tight leading-[1.2] text-[#0F172A]"
             >
               {RESUME_PROFILE.name}
             </h2>
-            <p className="mt-1 text-base text-[#475569]">{RESUME_PROFILE.title}</p>
+            <p className="mt-0.5 text-sm text-[#475569]">{RESUME_PROFILE.title}</p>
           </div>
           <a href={RESUME_PDF.url} download={RESUME_PDF.downloadName} className={downloadButton}>
-            <Download className="w-4 h-4" />
+            <Download className="w-3.5 h-3.5" />
             Download PDF
           </a>
         </div>
@@ -55,7 +56,7 @@ export function ResumeModal({ open, onClose }: ResumeModalProps) {
               key={page.src}
               type="button"
               onClick={() => setViewing(i)}
-              className="block w-full overflow-hidden rounded-md border border-[#E2E8F0] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.08)] cursor-zoom-in focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D4ED8]"
+              className="block w-full sm:w-fit sm:mx-auto overflow-hidden rounded-md border border-[#E2E8F0] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.08)] cursor-zoom-in focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D4ED8]"
               aria-label={`View the resume full screen${total > 1 ? ` (page ${i + 1} of ${total})` : ''}`}
             >
               <img
@@ -65,13 +66,13 @@ export function ResumeModal({ open, onClose }: ResumeModalProps) {
                 alt={pageAlt(i)}
                 loading={i === 0 ? 'eager' : 'lazy'}
                 decoding="async"
-                className="block w-full h-auto"
+                className="block w-full h-auto sm:w-auto sm:max-w-full sm:max-h-[calc(94svh-14rem)]"
               />
             </button>
           ))}
         </div>
 
-        <p className="mt-3 text-sm text-[#475569]">
+        <p className="mt-3 text-sm text-[#475569] sm:text-center">
           <span className="sm:hidden">Tap</span>
           <span className="max-sm:hidden">Click</span> the resume to view it full screen and zoom in.
         </p>

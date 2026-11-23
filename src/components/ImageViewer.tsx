@@ -95,7 +95,7 @@ function ViewerFrame({
       role="dialog"
       aria-modal="true"
       aria-label={image.alt}
-      className="fixed inset-0 z-[60] flex flex-col bg-[#0F172A]/95"
+      className="fixed inset-0 z-60 flex flex-col bg-[#0F172A]/95"
       // Don't let clicks inside reach the popup underneath (which would close it)
       onClick={(e) => {
         e.stopPropagation();
